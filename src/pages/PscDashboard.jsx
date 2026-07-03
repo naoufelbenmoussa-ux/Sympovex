@@ -118,6 +118,7 @@ export default function PscDashboard() {
   // Support ticket state
   const pscTickets = tickets.filter(t => t.assignedTo === 'CS');
   const [activeTicketId, setActiveTicketId] = useState(null);
+  const selectedTicket = pscTickets.find(t => t.id === activeTicketId);
   const [ticketReplyText, setTicketReplyText] = useState('');
 
   // Derived lists

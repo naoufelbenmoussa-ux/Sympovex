@@ -41,66 +41,68 @@ export default function Header({ currentView, setCurrentView }) {
   return (
     <header className="w-full flex flex-col border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-50 animate-in fade-in">
       {/* TESTER PANEL */}
-      <div className="bg-slate-900 text-slate-100 text-xs px-4 py-2 flex flex-wrap items-center justify-between gap-4 border-b border-slate-800">
-        <div className="flex items-center gap-2 font-mono">
-          <Shield className="w-4 h-4 text-amber-500 animate-pulse" />
-          <span className="font-bold text-amber-400">SYMPOVEX MOCK SaaS PANEL:</span>
-        </div>
+      {currentUser?.role === 'Superadmin' && (
+        <div className="bg-slate-900 text-slate-100 text-xs px-4 py-2 flex flex-wrap items-center justify-between gap-4 border-b border-slate-800">
+          <div className="flex items-center gap-2 font-mono">
+            <Shield className="w-4 h-4 text-amber-500 animate-pulse" />
+            <span className="font-bold text-amber-400">SYMPOVEX MOCK SaaS PANEL:</span>
+          </div>
 
-        <div className="flex flex-wrap items-center gap-4 font-mono">
-          {/* Tenant Switcher */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400">Tenant:</span>
-            <select
-              value={currentConfId}
-              onChange={(e) => setCurrentConferenceId(e.target.value)}
-              className="bg-slate-800 text-white font-semibold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:border-amber-500 text-[11px]"
+          <div className="flex flex-wrap items-center gap-4 font-mono">
+            {/* Tenant Switcher */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-400">Tenant:</span>
+              <select
+                value={currentConfId}
+                onChange={(e) => setCurrentConferenceId(e.target.value)}
+                className="bg-slate-800 text-white font-semibold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:border-amber-500 text-[11px]"
+              >
+                {conferences.map(c => (
+                  <option key={c.id} value={c.id}>{c.name.split(' (')[0]}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* User Impersonator */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-400">Impersonate:</span>
+              <select
+                value={currentUserId || ''}
+                onChange={(e) => {
+                  setCurrentUserId(e.target.value || null);
+                  setCurrentView('dashboard');
+                }}
+                className="bg-slate-800 text-white font-semibold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:border-amber-500 text-[11px]"
+              >
+                <option value="">Guest Mode (Logged Out)</option>
+                {availableUsers.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.roles ? u.roles.join(', ') : u.role}) {u.status === 'pending' ? '[PENDING]' : u.status === 'suspended' ? '[SUSPENDED]' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Active Colors Indicator */}
+            <div className="flex items-center gap-1">
+              <span className="text-slate-400 mr-1">Colors:</span>
+              <span className="w-3.5 h-3.5 rounded-full border border-slate-600" style={{ backgroundColor: currentConference?.colors?.primary }} title="Primary" />
+              <span className="w-3.5 h-3.5 rounded-full border border-slate-600" style={{ backgroundColor: currentConference?.colors?.secondary }} title="Secondary" />
+              <span className="w-3.5 h-3.5 rounded-full border border-slate-600" style={{ backgroundColor: currentConference?.colors?.accent }} title="Accent" />
+            </div>
+
+            {/* Reset DB button */}
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-1 bg-red-955/40 text-red-400 hover:bg-red-955 hover:text-white px-2 py-0.5 rounded border border-red-900 transition font-medium cursor-pointer text-[10px]"
+              title="Wipe database modifications"
             >
-              {conferences.map(c => (
-                <option key={c.id} value={c.id}>{c.name.split(' (')[0]}</option>
-              ))}
-            </select>
+              <RefreshCw className="w-3 h-3" />
+              Reset DB
+            </button>
           </div>
-
-          {/* User Impersonator */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400">Impersonate:</span>
-            <select
-              value={currentUserId || ''}
-              onChange={(e) => {
-                setCurrentUserId(e.target.value || null);
-                setCurrentView('dashboard');
-              }}
-              className="bg-slate-800 text-white font-semibold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:border-amber-500 text-[11px]"
-            >
-              <option value="">Guest Mode (Logged Out)</option>
-              {availableUsers.map(u => (
-                <option key={u.id} value={u.id}>
-                  {u.name} ({u.roles ? u.roles.join(', ') : u.role}) {u.status === 'pending' ? '[PENDING]' : u.status === 'suspended' ? '[SUSPENDED]' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Active Colors Indicator */}
-          <div className="flex items-center gap-1">
-            <span className="text-slate-400 mr-1">Colors:</span>
-            <span className="w-3.5 h-3.5 rounded-full border border-slate-600" style={{ backgroundColor: currentConference?.colors?.primary }} title="Primary" />
-            <span className="w-3.5 h-3.5 rounded-full border border-slate-600" style={{ backgroundColor: currentConference?.colors?.secondary }} title="Secondary" />
-            <span className="w-3.5 h-3.5 rounded-full border border-slate-600" style={{ backgroundColor: currentConference?.colors?.accent }} title="Accent" />
-          </div>
-
-          {/* Reset DB button */}
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-1 bg-red-950/40 text-red-400 hover:bg-red-955 hover:text-white px-2 py-0.5 rounded border border-red-900 transition font-medium cursor-pointer text-[10px]"
-            title="Wipe database modifications"
-          >
-            <RefreshCw className="w-3 h-3" />
-            Reset DB
-          </button>
         </div>
-      </div>
+      )}
 
       {/* PUBLIC NAVBAR */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">

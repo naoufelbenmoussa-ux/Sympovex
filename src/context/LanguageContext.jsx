@@ -186,6 +186,15 @@ const translations = {
     reviewSuccess: "Rapport d'évaluation soumis avec succès !",
     alreadyReviewed: "Vous avez déjà soumis un rapport pour cet article.",
     noAssignedPapers: "Aucun article ne vous a encore été assigné.",
+    viewScoreCard: "Voir la fiche d'évaluation",
+    readOnlyReview: "Rapport Soumis (Lecture Seule)",
+    closePane: "Fermer le panneau",
+    selectManuscriptPrompt: "Sélectionnez un article dans la liste de gauche pour commencer votre évaluation.",
+    choosePhotoSubmit: "Choisissez une photo à soumettre",
+    photoCaptionPlaceholder: "Ex. Session plénière ou networking",
+    noAssignedPapersTrack: "Aucun manuscrit n'est affecté à votre profil de track.",
+    originalityNovelty: "Originalité & Nouveauté",
+    methodologyRigor: "Méthodologie & Rigueur",
     
     // ── PSC Dashboard ─────────────────────────────────────────────────────────
     pscConsole: "Console du Comité Scientifique (PSC)",
@@ -558,6 +567,15 @@ const translations = {
     reviewSuccess: "Evaluation report submitted successfully!",
     alreadyReviewed: "You have already submitted a report for this manuscript.",
     noAssignedPapers: "No manuscripts have been assigned to you yet.",
+    viewScoreCard: "View Score Card",
+    readOnlyReview: "Review Submitted (Read Only)",
+    closePane: "Close Pane",
+    selectManuscriptPrompt: "Select an assigned manuscript from the left list to start your evaluation.",
+    choosePhotoSubmit: "Choose a photo to submit",
+    photoCaptionPlaceholder: "E.g. Plenary session or networking",
+    noAssignedPapersTrack: "No manuscripts assigned to your track profile.",
+    originalityNovelty: "Originality & Novelty",
+    methodologyRigor: "Methodology & Rigor",
     
     // ── PSC Dashboard ─────────────────────────────────────────────────────────
     pscConsole: "Scientific Committee (PSC) Master Console",

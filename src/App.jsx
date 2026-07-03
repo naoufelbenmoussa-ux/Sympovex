@@ -14,7 +14,9 @@ function AppContent() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === '#/dashboard') {
+      const cleanHash = hash.replace(/^#\/?/, '');
+      const parts = cleanHash.split('/').filter(Boolean);
+      if (parts[1] === 'dashboard') {
         setCurrentView('dashboard');
       } else {
         setCurrentView('landing');
@@ -30,10 +32,13 @@ function AppContent() {
   // Update hash route when toggling views
   const setViewAndHash = (view) => {
     setCurrentView(view);
+    const cleanHash = window.location.hash.replace(/^#\/?/, '');
+    const parts = cleanHash.split('/').filter(Boolean);
+    const acronym = parts[0] || 'gacs2026';
     if (view === 'dashboard') {
-      window.location.hash = '#/dashboard';
+      window.location.hash = `#/${acronym}/dashboard`;
     } else {
-      window.location.hash = '#/';
+      window.location.hash = `#/${acronym}`;
     }
   };
 

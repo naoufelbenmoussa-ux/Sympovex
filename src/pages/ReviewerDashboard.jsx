@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDatabase } from '../context/DatabaseContext';
+import { useLanguage } from '../context/LanguageContext';
 import { FileText, CheckCircle, Clock, Send, Star, AlertCircle, Sparkles, Upload, Check, Download, FileDown } from 'lucide-react';
 
 export default function ReviewerDashboard() {
@@ -12,6 +13,7 @@ export default function ReviewerDashboard() {
     evaluationCriteria,
     submitGalleryPhoto
   } = useDatabase();
+  const { t } = useLanguage();
 
   const [revTab, setRevTab] = useState('papers'); // 'papers', 'gallery'
   const [evaluatingPaperId, setEvaluatingPaperId] = useState(null);
@@ -105,15 +107,15 @@ export default function ReviewerDashboard() {
       
       {/* HEADER */}
       <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Peer Reviewer Evaluation Workspace</h2>
-        <p className="text-sm text-slate-500">View assigned paper manuscripts, grade scientific contribution, configure ratings, and share congress moments.</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('reviewerConsole')}</h2>
+        <p className="text-sm text-slate-500">{t('reviewerDesc')}</p>
       </div>
 
       {/* SUB TABS */}
       <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none">
         {[
-          { id: 'papers', label: 'Assigned Submissions', icon: FileText },
-          { id: 'gallery', label: 'Upload Event Photos', icon: Sparkles }
+          { id: 'papers', label: t('assignedPapers'), icon: FileText },
+          { id: 'gallery', label: t('galleryUpload'), icon: Sparkles }
         ].map(tab => {
           const Icon = tab.icon;
           return (
@@ -126,7 +128,7 @@ export default function ReviewerDashboard() {
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-4.5 h-4.5" />
               {tab.label}
             </button>
           );
@@ -144,19 +146,19 @@ export default function ReviewerDashboard() {
             <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex flex-wrap items-center justify-between gap-4">
               <div className="space-y-1">
                 <h4 className="font-extrabold text-xs text-indigo-755 dark:text-indigo-400 flex items-center gap-1">
-                  <FileDown className="w-4 h-4" /> Actes du Congrès / Official Proceedings
+                  <FileDown className="w-4 h-4" /> {t('proceedingsDownload')}
                 </h4>
-                <p className="text-[11px] text-slate-500 max-w-lg font-medium leading-relaxed">Accédez au recueil complet de tous les articles et abrégés acceptés pour cette édition de la conférence.</p>
+                <p className="text-[11px] text-slate-500 max-w-lg font-medium leading-relaxed">{t('proceedingsDesc')}</p>
               </div>
               <button
                 onClick={() => alert('Téléchargement du fichier proceedings_gacs2026.pdf (Simulation)')}
                 className="py-1.5 px-4 bg-indigo-650 hover:bg-indigo-700 text-white font-bold text-[10px] rounded-lg transition shadow-xs flex items-center gap-1 cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5" /> Download Proceedings
+                <Download className="w-3.5 h-3.5" /> {t('proceedingsBtn')}
               </button>
             </div>
 
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm">Manuscripts Assigned to your Track</h3>
+            <h3 className="font-bold text-slate-900 dark:text-white text-sm">{t('assignedPapers')}</h3>
             
             <div className="space-y-3">
               {assignedPapers.map(paper => {
@@ -175,7 +177,7 @@ export default function ReviewerDashboard() {
                           onClick={() => alert(`Downloading manuscript file: ${paper.versions[paper.versions.length - 1]?.fileName}`)}
                           className="text-primary hover:underline font-bold cursor-pointer"
                         >
-                          Download Manuscript File
+                          {t('download')} {t('paperLabel')}
                         </button>
                       </div>
                     </div>
@@ -184,13 +186,13 @@ export default function ReviewerDashboard() {
                       <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase block text-center ${
                         myReview ? 'bg-green-500/10 text-green-650' : 'bg-amber-500/10 text-amber-650'
                       }`}>
-                        {myReview ? 'Reviewed' : 'Pending Evaluation'}
+                        {myReview ? t('statusReviewed') : t('statusPending')}
                       </span>
                       <button
                         onClick={() => setEvaluatingPaperId(paper.id)}
                         className="px-3 py-1.5 bg-primary hover:bg-secondary text-white font-bold text-xs rounded-lg transition cursor-pointer shadow-xs"
                       >
-                        {myReview ? 'View Score Card' : 'Evaluate Paper'}
+                        {myReview ? t('viewScoreCard') : t('evaluateBtn')}
                       </button>
                     </div>
                   </div>
@@ -199,7 +201,7 @@ export default function ReviewerDashboard() {
 
               {assignedPapers.length === 0 && (
                 <div className="text-center py-20 bg-white dark:bg-slate-900 border rounded-2xl text-slate-400 italic text-xs shadow-xs">
-                  No manuscripts assigned to your track profile.
+                  {t('noAssignedPapersTrack')}
                 </div>
               )}
             </div>
@@ -210,7 +212,7 @@ export default function ReviewerDashboard() {
             {selectedPaper ? (
               <div className="space-y-6">
                 <div className="border-b pb-2">
-                  <span className="text-[10px] font-mono text-slate-400">Evaluate</span>
+                  <span className="text-[10px] font-mono text-slate-400">{t('colStatus')}</span>
                   <h3 className="font-bold text-xs text-slate-900 dark:text-white mt-0.5 line-clamp-2 leading-tight">{selectedPaper.title}</h3>
                 </div>
 
@@ -218,13 +220,13 @@ export default function ReviewerDashboard() {
                   <div className="space-y-5 text-xs text-slate-500">
                     <div className="flex items-center gap-1.5 bg-green-500/10 text-green-600 dark:text-green-400 p-3 rounded-lg border border-green-500/10 font-bold">
                       <CheckCircle className="w-4 h-4" />
-                      Review Submitted (Read Only)
+                      {t('readOnlyReview')}
                     </div>
                     <button
                       onClick={() => setEvaluatingPaperId(null)}
                       className="w-full py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-350 rounded font-semibold transition cursor-pointer"
                     >
-                      Close Pane
+                      {t('closePane')}
                     </button>
                   </div>
                 ) : (
@@ -232,7 +234,7 @@ export default function ReviewerDashboard() {
                     
                     {/* Render Criteria Dynamically */}
                     <div className="space-y-3">
-                      <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1">Star Ratings Per Criteria</h4>
+                      <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1">{t('scoreCriteria')}</h4>
                       {activeCriteria.map(crit => {
                         const score = critScores[crit.id] || 3;
                         return (
@@ -251,13 +253,11 @@ export default function ReviewerDashboard() {
                             />
                           </div>
                         );
-                      })}
-
-                      {activeCriteria.length === 0 && (
+                      })}                      {activeCriteria.length === 0 && (
                         <>
                           <div className="space-y-1">
                             <div className="flex justify-between font-bold text-slate-500">
-                              <span>Originality & Novelty</span>
+                              <span>{t('originalityNovelty')}</span>
                               <span className="text-primary font-mono">{originality} / 5</span>
                             </div>
                             <input
@@ -271,7 +271,7 @@ export default function ReviewerDashboard() {
                           </div>
                           <div className="space-y-1">
                             <div className="flex justify-between font-bold text-slate-500">
-                              <span>Methodology & Rigor</span>
+                              <span>{t('methodologyRigor')}</span>
                               <span className="text-primary font-mono">{methodology} / 5</span>
                             </div>
                             <input
@@ -289,20 +289,20 @@ export default function ReviewerDashboard() {
 
                     {/* Presentation format recommendation */}
                     <div className="space-y-1.5 border-t pt-3">
-                      <label className="font-bold text-slate-500 block">Format de présentation recommandé</label>
+                      <label className="font-bold text-slate-500 block">{t('presentationFormat')}</label>
                       <select
                         value={presentationFormat}
                         onChange={(e) => setPresentationFormat(e.target.value)}
-                        className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                        className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none"
                       >
-                        <option value="Oral Presentation">Présentation Orale (Oral)</option>
-                        <option value="Poster Presentation">Présentation Poster</option>
+                        <option value="Oral Presentation">{t('oralFormat')}</option>
+                        <option value="Poster Presentation">{t('posterFormat')}</option>
                       </select>
                     </div>
 
                     {/* Scientific Comments */}
                     <div className="space-y-1.5">
-                      <label className="font-bold text-slate-500">Remarques Scientifiques (Scientific Content)</label>
+                      <label className="font-bold text-slate-500">{t('commentsSciLabel')}</label>
                       <textarea
                         rows={2}
                         required
@@ -315,7 +315,7 @@ export default function ReviewerDashboard() {
 
                     {/* Formatting Comments */}
                     <div className="space-y-1.5">
-                      <label className="font-bold text-slate-500">Remarques de Forme (Structure & Format)</label>
+                      <label className="font-bold text-slate-500">{t('commentsFormLabel')}</label>
                       <textarea
                         rows={2}
                         required
@@ -328,7 +328,7 @@ export default function ReviewerDashboard() {
 
                     {/* File Attachment */}
                     <div className="space-y-1.5">
-                      <label className="font-bold text-slate-500 block">Attacher un fichier de commentaires (.pdf / .docx)</label>
+                      <label className="font-bold text-slate-500 block">{t('attachCommentsFile')}</label>
                       <input
                         type="file"
                         accept=".pdf,.docx,.doc"
@@ -341,7 +341,7 @@ export default function ReviewerDashboard() {
                       type="submit"
                       className="w-full py-2 bg-primary hover:bg-secondary text-white font-semibold rounded-lg transition shadow-xs flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      <Send className="w-3.5 h-3.5" /> Commit Evaluation Grid
+                      <Send className="w-3.5 h-3.5" /> {t('reviewSubmitBtn')}
                     </button>
                   </form>
                 )}
@@ -349,7 +349,7 @@ export default function ReviewerDashboard() {
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-slate-400 p-8 text-center italic text-xs">
                 <AlertCircle className="w-8 h-8 text-slate-300 mb-2" />
-                Select an assigned manuscript from the left list to start your evaluation.
+                {t('selectManuscriptPrompt')}
               </div>
             )}
           </div>
@@ -360,19 +360,19 @@ export default function ReviewerDashboard() {
       {revTab === 'gallery' && (
         <div className="max-w-xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
           <div>
-            <h3 className="font-bold text-sm text-slate-900 dark:text-white">Partager des photos de l'événement en temps réel</h3>
-            <p className="text-xs text-slate-500">Soumettez des images du congrès. Elles apparaîtront après validation administrative.</p>
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white">{t('galleryUpload')}</h3>
+            <p className="text-xs text-slate-500">{t('galleryDesc')}</p>
           </div>
 
           <form onSubmit={handleGallerySubmit} className="space-y-4">
             {gallerySuccess && (
               <div className="p-3 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/15 rounded-xl text-xs font-semibold text-center animate-in zoom-in-95">
-                Photo envoyée pour modération !
+                {t('gallerySuccess')}
               </div>
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 block">Choisissez une photo à soumettre</label>
+              <label className="text-xs font-bold text-slate-500 block">{t('choosePhotoSubmit')}</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=350",
@@ -392,11 +392,11 @@ export default function ReviewerDashboard() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-550">Légende de la photo</label>
+              <label className="text-xs font-bold text-slate-550">{t('galleryCaptionLabel')}</label>
               <input
                 type="text"
                 required
-                placeholder="E.g. Session plénière ou Réseau"
+                placeholder={t('photoCaptionPlaceholder')}
                 value={galleryCaption}
                 onChange={(e) => setGalleryCaption(e.target.value)}
                 className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
@@ -407,7 +407,7 @@ export default function ReviewerDashboard() {
               type="submit"
               className="w-full py-2.5 bg-primary hover:bg-secondary text-white font-bold text-xs rounded-lg transition shadow-md shadow-primary/10 cursor-pointer"
             >
-              Envoyer la photo
+              {t('gallerySubmitBtn')}
             </button>
           </form>
         </div>

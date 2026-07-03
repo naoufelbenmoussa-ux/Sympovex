@@ -27,7 +27,73 @@ export const DatabaseProvider = ({ children }) => {
     surveySubmissions: []
   });
 
-  const [currentConfId, setCurrentConfId] = useState('gacs2026');
+  const [currentConfId, setCurrentConfId] = useState(() => {
+    const hash = window.location.hash;
+    const cleanHash = hash.replace(/^#\/?/, '');
+    const parts = cleanHash.split('/').filter(Boolean);
+    const acronym = parts[0];
+    if (acronym) {
+      try {
+        const stored = localStorage.getItem('sympovex_db');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed.conferences) {
+            const match = parsed.conferences.find(c => c.id === acronym || (c.acronym && c.acronym.toLowerCase() === acronym.toLowerCase()));
+            if (match) return match.id;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return 'gacs2026';
+  });
+
+  // Sync state when URL hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      const cleanHash = hash.replace(/^#\/?/, '');
+      const parts = cleanHash.split('/').filter(Boolean);
+      const acronym = parts[0];
+      if (acronym) {
+        const confs = dbInstance.getTable('conferences');
+        const match = confs.find(c => c.id === acronym || (c.acronym && c.acronym.toLowerCase() === acronym.toLowerCase()));
+        if (match) {
+          if (match.id !== currentConfId) {
+            setCurrentConfId(match.id);
+          }
+        } else {
+          window.location.hash = `#/gacs2026${cleanHash.includes('/dashboard') ? '/dashboard' : ''}`;
+        }
+      } else {
+        window.location.hash = '#/gacs2026';
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    
+    if (!window.location.hash) {
+      window.location.hash = '#/gacs2026';
+    } else {
+      handleHashChange();
+    }
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [currentConfId]);
+
+  const changeConference = (confId) => {
+    const confs = dbInstance.getTable('conferences');
+    const conf = confs.find(c => c.id === confId);
+    if (conf) {
+      const acronym = (conf.acronym || conf.id).toLowerCase();
+      const currentHash = window.location.hash.replace(/^#\/?/, '');
+      const isDashboard = currentHash.includes('/dashboard');
+      window.location.hash = `#/${acronym}${isDashboard ? '/dashboard' : ''}`;
+      setCurrentConfId(confId);
+    }
+  };
+
   const currentUserId = session?.userId || null;
   const setCurrentUserId = (userId) => {
     impersonate(userId);
@@ -76,12 +142,16 @@ export const DatabaseProvider = ({ children }) => {
 
   const createNewConference = (confData) => {
     const confs = dbInstance.getTable('conferences');
-    const newId = confData.name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10);
+    const cleanAcronym = confData.acronym 
+      ? confData.acronym.toLowerCase().replace(/[^a-z0-9]/g, '')
+      : confData.name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10);
+    const newId = cleanAcronym;
     const newConf = {
       id: newId,
       logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=60',
       colors: { primary: '#6366f1', secondary: '#4f46e5', accent: '#f59e0b' },
-      ...confData
+      ...confData,
+      acronym: confData.acronym || newId.toUpperCase()
     };
     confs.push(newConf);
     dbInstance.updateTable('conferences', confs);
@@ -481,7 +551,7 @@ export const DatabaseProvider = ({ children }) => {
       currentUser,
       currentConfId,
       currentUserId,
-      setCurrentConferenceId: setCurrentConfId,
+      setCurrentConferenceId: changeConference,
       setCurrentUserId,
       updateConferenceDetails,
       createNewConference,

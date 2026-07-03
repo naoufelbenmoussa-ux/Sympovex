@@ -16,6 +16,7 @@ export default function SuperadminDashboard() {
   } = useDatabase();
 
   const [newConfName, setNewConfName] = useState('');
+  const [newConfAcronym, setNewConfAcronym] = useState('');
   const [newConfStart, setNewConfStart] = useState('');
   const [newConfEnd, setNewConfEnd] = useState('');
   const [newConfVenue, setNewConfVenue] = useState('');
@@ -136,15 +137,17 @@ CREATE TABLE votes (
 
   const handleCreateConf = (e) => {
     e.preventDefault();
-    if (!newConfName || !newConfVenue) return;
+    if (!newConfName || !newConfVenue || !newConfAcronym) return;
     createNewConference({
       name: newConfName,
+      acronym: newConfAcronym.toUpperCase(),
       startDate: newConfStart || '2026-10-12',
       endDate: newConfEnd || '2026-10-15',
       venue: newConfVenue
     });
     setConfSuccess(true);
     setNewConfName('');
+    setNewConfAcronym('');
     setNewConfVenue('');
     setTimeout(() => setConfSuccess(false), 4000);
   };
@@ -281,16 +284,29 @@ CREATE TABLE votes (
           </h3>
 
           <form onSubmit={handleCreateConf} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500">Conference Name</label>
-              <input
-                type="text"
-                placeholder="International Conference on Biotech (ICB 2026)"
-                value={newConfName}
-                onChange={(e) => setNewConfName(e.target.value)}
-                required
-                className="w-full text-sm rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
-              />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2 space-y-1.5">
+                <label className="text-xs font-bold text-slate-500">Conference Name</label>
+                <input
+                  type="text"
+                  placeholder="International Conference on Biotech (ICB 2026)"
+                  value={newConfName}
+                  onChange={(e) => setNewConfName(e.target.value)}
+                  required
+                  className="w-full text-sm rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500">Acronym</label>
+                <input
+                  type="text"
+                  placeholder="ICB 2026"
+                  value={newConfAcronym}
+                  onChange={(e) => setNewConfAcronym(e.target.value)}
+                  required
+                  className="w-full text-sm rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
+                />
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
