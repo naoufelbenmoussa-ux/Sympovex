@@ -74,6 +74,8 @@ export default function PscDashboard() {
   const [provPassword, setProvPassword] = useState('');
   const [provSuccess, setProvSuccess] = useState(false);
   const [provError, setProvError] = useState('');
+  const [bulkImportReport, setBulkImportReport] = useState('');
+  const [bulkImportSuccess, setBulkImportSuccess] = useState(false);
 
   // Email Overlay States
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
@@ -358,6 +360,108 @@ export default function PscDashboard() {
     }
   };
 
+  // Bulk Provisioning — Download CSV Template
+  const handleDownloadTemplate = () => {
+    const headers = "Name,Email,Role,Affiliation,TemporaryPassword\n";
+    const sampleRow = "John Doe,john.doe@gmail.com,Participant,MIT,pass123\nJane Smith,jane.smith@gmail.com,Reviewer,Stanford,pass456\n";
+    const blob = new Blob([headers + sampleRow], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "sympovex_provisioning_template.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Bulk Provisioning — Export users by Role
+  const handleExportByRole = (targetRole) => {
+    const filteredUsers = users.filter(u => {
+      const matchesConf = u.conferenceId === currentConference.id;
+      if (targetRole === 'Participant') {
+        return matchesConf && u.role === 'Participant';
+      } else if (targetRole === 'Reviewer') {
+        return matchesConf && u.roles && u.roles.includes('Reviewer');
+      } else {
+        return matchesConf && (u.role === 'Participant' || (u.roles && u.roles.includes('Reviewer')));
+      }
+    });
+
+    let csv = "ID,Name,Email,Affiliation,Role,Status\n";
+    filteredUsers.forEach(u => {
+      const displayRole = u.roles ? u.roles.join('; ') : u.role;
+      csv += `"${u.id}","${u.name}","${u.email}","${u.affiliation}","${displayRole}","${u.status}"\n`;
+    });
+    downloadCSV(csv, `${currentConference.id}_${targetRole.toLowerCase()}s_export.csv`);
+  };
+
+  // Bulk Provisioning — Import CSV
+  const handleBulkImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n');
+      let importCount = 0;
+      let skipCount = 0;
+      let errors = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+        if (cols.length < 3) continue;
+
+        const name = cols[0];
+        const email = cols[1];
+        const role = cols[2] || 'Participant';
+        const affiliation = cols[3] || '';
+        const password = cols[4] || 'tempPassword123';
+
+        if (!name || !email) {
+          skipCount++;
+          continue;
+        }
+
+        let mappedRole = 'Participant';
+        if (role.toLowerCase().includes('rev')) {
+          mappedRole = 'Reviewer';
+        }
+
+        const res = adminCreateUser({
+          name,
+          email,
+          role: mappedRole,
+          affiliation,
+          password
+        });
+
+        if (res.success) {
+          importCount++;
+        } else {
+          skipCount++;
+          errors.push(`${email}: ${res.error}`);
+        }
+      }
+
+      setBulkImportSuccess(true);
+      if (errors.length > 0) {
+        setBulkImportReport(t('importReportSuccess').replace('{count}', importCount) + ` (Skipped: ${skipCount})`);
+      } else {
+        setBulkImportReport(t('importReportSuccess').replace('{count}', importCount));
+      }
+      setTimeout(() => {
+        setBulkImportSuccess(false);
+        setBulkImportReport('');
+      }, 8000);
+    };
+    reader.readAsText(file);
+  };
+
   // Reply to ticket
   const handleReplyTicket = (e) => {
     e.preventDefault();
@@ -478,11 +582,11 @@ export default function PscDashboard() {
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="border-b bg-slate-55 dark:bg-slate-900/50 text-slate-400 font-bold uppercase">
-                        <th className="p-3">Title & Authors</th>
-                        <th className="p-3">Selected Topics</th>
-                        <th className="p-3">Assigned Reviewers</th>
-                        <th className="p-3">Avg Score</th>
-                        <th className="p-3 text-right">Actions</th>
+                        <th className="p-3">{t('colTitleAuthors')}</th>
+                        <th className="p-3">{t('colTopics')}</th>
+                        <th className="p-3">{t('colReviewers')}</th>
+                        <th className="p-3">{t('colAvgScore')}</th>
+                        <th className="p-3 text-right">{t('colActions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1046,7 +1150,7 @@ export default function PscDashboard() {
             {/* GUIDELINES EDITOR */}
             <div className="bg-white dark:bg-slate-900 border rounded-2xl p-6 shadow-xs space-y-4">
               <div>
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white">Author Submission Guidelines</h3>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">{t('authorInstructions')}</h3>
                 <p className="text-xs text-slate-500">Provide official submission formatting instructions displayed to authors when submitting papers.</p>
               </div>
 
@@ -1055,14 +1159,14 @@ export default function PscDashboard() {
                   rows={6}
                   value={guidelinesText}
                   onChange={(e) => setGuidelinesText(e.target.value)}
-                  placeholder="E.g. All manuscripts must use the ACM format. Short papers have a limit of 4 pages..."
-                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-955 dark:text-white focus:outline-none"
+                  placeholder={t('authorInstructionsPlaceholder')}
+                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-955 dark:text-white focus:outline-none"
                 />
                 <button
                   type="submit"
                   className="px-4 py-2 bg-primary hover:bg-secondary text-white font-bold text-xs rounded-lg transition shadow-md shadow-primary/10 cursor-pointer"
                 >
-                  Save Submission Instructions
+                  {t('saveGuidelines')}
                 </button>
               </form>
             </div>
@@ -1070,25 +1174,25 @@ export default function PscDashboard() {
             {/* CRITERIA CRUD */}
             <div className="bg-white dark:bg-slate-900 border rounded-2xl p-6 shadow-xs space-y-6">
               <div>
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white">Scientific Evaluation Criteria</h3>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">{t('evaluationCriteria')}</h3>
                 <p className="text-xs text-slate-500">Configure dynamically rated items with custom maximum scores for peer review cards.</p>
               </div>
 
               {/* Form to add criterion */}
               <form onSubmit={handleCreateCriterion} className="flex gap-4 items-end">
                 <div className="flex-1 space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-500">Criterion Name</label>
+                  <label className="text-[10px] font-bold text-slate-500">{t('critName')}</label>
                   <input
                     type="text"
                     required
                     placeholder="E.g. Technical Rigor"
                     value={critName}
                     onChange={(e) => setCritName(e.target.value)}
-                    className="w-full text-xs rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                    className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none"
                   />
                 </div>
                 <div className="w-24 space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-500">Max Score</label>
+                  <label className="text-[10px] font-bold text-slate-500">{t('critMaxScore')}</label>
                   <input
                     type="number"
                     min={1}
@@ -1096,14 +1200,14 @@ export default function PscDashboard() {
                     required
                     value={critMaxScore}
                     onChange={(e) => setCritMaxScore(e.target.value)}
-                    className="w-full text-xs rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                    className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none"
                   />
                 </div>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-primary hover:bg-secondary text-white font-bold text-xs rounded-lg transition shadow-md shadow-primary/10 cursor-pointer"
                 >
-                  Add
+                  {t('addCritBtn')}
                 </button>
               </form>
 
@@ -1174,12 +1278,12 @@ export default function PscDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b bg-slate-55 dark:bg-slate-900/50 text-slate-400 font-bold uppercase">
-                    <th className="p-3">Participant Name</th>
-                    <th className="p-3">Email Address</th>
-                    <th className="p-3">Affiliation</th>
-                    <th className="p-3">Account status</th>
-                    <th className="p-3">Roles</th>
-                    <th className="p-3 text-right">Actions</th>
+                    <th className="p-3">{t('provFullName')}</th>
+                    <th className="p-3">{t('provEmail')}</th>
+                    <th className="p-3">{t('provAffiliation')}</th>
+                    <th className="p-3">{t('status')}</th>
+                    <th className="p-3">{t('role')}</th>
+                    <th className="p-3 text-right">{t('colActions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1264,11 +1368,11 @@ export default function PscDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b bg-slate-55 dark:bg-slate-900/50 text-slate-400 font-bold uppercase">
-                    <th className="p-3">Assessor Profile</th>
-                    <th className="p-3">Institution Affiliation</th>
-                    <th className="p-3">Specialty Topics</th>
-                    <th className="p-3">Assigned Submissions</th>
-                    <th className="p-3 text-right">Actions</th>
+                    <th className="p-3">{t('reviewerLabel')}</th>
+                    <th className="p-3">{t('provAffiliation')}</th>
+                    <th className="p-3">{t('colTopics')}</th>
+                    <th className="p-3">{t('mySubmissions')}</th>
+                    <th className="p-3 text-right">{t('colActions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1430,95 +1534,172 @@ export default function PscDashboard() {
 
       {/* TAB 6: MANUAL ACCOUNT PROVISIONING WITH TEMP PASSWORD */}
       {pscTab === 'provisioning' && (
-        <div className="max-w-xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6">
-          <div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Manual Account Provisioning</h3>
-            <p className="text-xs text-slate-500">Create credentials for Participants or Reviewers. They will be forced to define a secure password on their very first login.</p>
-          </div>
-
-          <form onSubmit={handleProvisionUser} className="space-y-4">
-            {provSuccess && (
-              <div className="p-3.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/15 rounded-xl flex gap-2 text-xs font-semibold items-center animate-in zoom-in-95">
-                <Check className="w-4 h-4 shrink-0" />
-                <span>Account provisioned successfully! User status is Active with Forced Password Reset enabled.</span>
-              </div>
-            )}
-
-            {provError && (
-              <div className="p-3 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl flex gap-2 text-xs font-semibold items-center">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{provError}</span>
-              </div>
-            )}
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500">Full Name</label>
-              <input
-                type="text"
-                required
-                value={provName}
-                onChange={(e) => setProvName(e.target.value)}
-                placeholder="Dr. Sarah Connor"
-                className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
-              />
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          {/* LEFT: SINGLE USER PROVISIONING */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 animate-in fade-in duration-200">
+            <div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('tabProvisioning')}</h3>
+              <p className="text-xs text-slate-500">Create credentials for Participants or Reviewers. They will be forced to define a secure password on their very first login.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleProvisionUser} className="space-y-4">
+              {provSuccess && (
+                <div className="p-3.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/15 rounded-xl flex gap-2 text-xs font-semibold items-center animate-in zoom-in-95">
+                  <Check className="w-4 h-4 shrink-0" />
+                  <span>{t('provSuccess')}</span>
+                </div>
+              )}
+
+              {provError && (
+                <div className="p-3 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl flex gap-2 text-xs font-semibold items-center">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{provError}</span>
+                </div>
+              )}
+
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Email Address</label>
+                <label className="text-xs font-bold text-slate-500">{t('provFullName')}</label>
                 <input
-                  type="email"
+                  type="text"
                   required
-                  value={provEmail}
-                  onChange={(e) => setProvEmail(e.target.value)}
-                  placeholder="s.connor@cyberdyne.org"
-                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
+                  value={provName}
+                  onChange={(e) => setProvName(e.target.value)}
+                  placeholder="Dr. Sarah Connor"
+                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-955 dark:text-white focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500">{t('provEmail')}</label>
+                  <input
+                    type="email"
+                    required
+                    value={provEmail}
+                    onChange={(e) => setProvEmail(e.target.value)}
+                    placeholder="s.connor@cyberdyne.org"
+                    className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-955 dark:text-white focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500">{t('provRole')}</label>
+                  <select
+                    value={provRole}
+                    onChange={(e) => setProvRole(e.target.value)}
+                    className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none font-medium"
+                  >
+                    <option value="Participant">Participant / Delegate</option>
+                    <option value="Reviewer">Academic Reviewer</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500">{t('provAffiliation')}</label>
+                <input
+                  type="text"
+                  value={provAffiliation}
+                  onChange={(e) => setProvAffiliation(e.target.value)}
+                  placeholder="Cyberdyne Systems"
+                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-955 dark:text-white focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Security Role</label>
-                <select
-                  value={provRole}
-                  onChange={(e) => setProvRole(e.target.value)}
-                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none"
-                >
-                  <option value="Participant">Participant / Delegate</option>
-                  <option value="Reviewer">Academic Reviewer</option>
-                </select>
+                <label className="text-xs font-bold text-slate-500">{t('provPassword')}</label>
+                <input
+                  type="text"
+                  required
+                  value={provPassword}
+                  onChange={(e) => setProvPassword(e.target.value)}
+                  placeholder="E.g. tempPass123"
+                  className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-955 dark:text-white focus:outline-none"
+                />
               </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 bg-primary hover:bg-secondary text-white font-bold text-xs rounded-lg transition cursor-pointer shadow-md shadow-primary/10 mt-2"
+              >
+                {t('provBtn')}
+              </button>
+            </form>
+          </div>
+
+          {/* RIGHT: BULK ACCOUNT PROVISIONING */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 animate-in fade-in duration-200">
+            <div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('bulkProvisionTitle')}</h3>
+              <p className="text-xs text-slate-500">{t('bulkProvisionDesc')}</p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500">Affiliation Institution</label>
-              <input
-                type="text"
-                value={provAffiliation}
-                onChange={(e) => setProvAffiliation(e.target.value)}
-                placeholder="Cyberdyne Systems"
-                className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
-              />
-            </div>
+            <div className="space-y-4">
+              {bulkImportReport && (
+                <div className={`p-3.5 border rounded-xl flex gap-2 text-xs font-semibold items-center animate-in zoom-in-95 ${
+                  bulkImportSuccess ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/15' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/15'
+                }`}>
+                  {bulkImportSuccess ? <Check className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  <span>{bulkImportReport}</span>
+                </div>
+              )}
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500">Temporary Password</label>
-              <input
-                type="text"
-                required
-                value={provPassword}
-                onChange={(e) => setProvPassword(e.target.value)}
-                placeholder="E.g. tempPass123"
-                className="w-full text-xs rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none"
-              />
-            </div>
+              {/* Template Download */}
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <span className="font-medium text-slate-655 dark:text-slate-350">Download the required template Excel/CSV structure:</span>
+                <button
+                  onClick={handleDownloadTemplate}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 border hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-lg flex items-center gap-1 transition cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" /> {t('downloadTemplate')}
+                </button>
+              </div>
 
-            <button
-              type="submit"
-              className="w-full py-2.5 bg-primary hover:bg-secondary text-white font-bold text-xs rounded-lg transition cursor-pointer shadow-md shadow-primary/10 mt-2"
-            >
-              Provision Active Account
-            </button>
-          </form>
+              {/* File Uploader */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500">{t('importPlaceholder')}</label>
+                <div className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 text-center hover:border-primary transition duration-150">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleBulkImport}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="space-y-1">
+                    <Upload className="mx-auto w-8 h-8 text-slate-400" />
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{t('importFileBtn')}</p>
+                    <p className="text-[10px] text-slate-400">Supports .csv (Excel compatible) files</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Exports */}
+              <div className="pt-4 border-t space-y-3">
+                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Export Existing Lists</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => handleExportByRole('Participant')}
+                    className="py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-lg border flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" /> {t('exportPartBtn')}
+                  </button>
+                  <button
+                    onClick={() => handleExportByRole('Reviewer')}
+                    className="py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-lg border flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" /> {t('exportRevBtn')}
+                  </button>
+                </div>
+                <button
+                  onClick={() => handleExportByRole('All')}
+                  className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/20 dark:hover:bg-indigo-900/30 text-indigo-650 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" /> {t('exportAllBtn')}
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
       )}
 

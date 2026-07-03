@@ -71,6 +71,13 @@ const translations = {
     submitBtn: "Valider",
     loginError: "Email ou mot de passe incorrect.",
     loginSuccess: "Connexion réussie !",
+    authTitle: "Authentification Sympovex",
+    awaitingValTitle: "En attente de validation",
+    awaitingValDesc: "Votre demande d'inscription est en attente de validation par l'administrateur. Vous pourrez vous connecter une fois activé.",
+    submitReg: "Soumettre l'inscription",
+    regSuccessTitle: "Demande d'inscription reçue",
+    regSuccessDesc: "Votre demande d'inscription a été enregistrée avec succès. Un administrateur l'examinera et la validera avant que vous ne puissiez vous connecter.",
+    createAccount: "Créer un compte",
     
     // ── Dashboard Hub ─────────────────────────────────────────────────────────
     accessRestricted: "Accès à l'Espace Restreint",
@@ -271,6 +278,19 @@ const translations = {
     provBtn: "Créer le Compte",
     provSuccess: "Compte créé. L'utilisateur devra changer son mot de passe à la connexion.",
     
+    // PSC — Provisioning Bulk
+    bulkProvisionTitle: "Provisionnement en Masse (Excel/CSV)",
+    bulkProvisionDesc: "Importez une liste d'utilisateurs depuis un fichier Excel/CSV ou exportez les comptes existants.",
+    downloadTemplate: "Télécharger le modèle (.csv)",
+    importPlaceholder: "Glissez-déposez ou sélectionnez un fichier CSV...",
+    importFileBtn: "Choisir un fichier",
+    importSubmitBtn: "Importer et Créer",
+    exportPartBtn: "Exporter les Participants",
+    exportRevBtn: "Exporter les Évaluateurs",
+    exportAllBtn: "Exporter Tous les Comptes",
+    importReportSuccess: "Import réussi ! {count} comptes ont été provisionnés.",
+    importReportError: "Erreur lors de l'import: {error}",
+    
     // PSC — Guidelines & Criteria
     authorInstructions: "Instructions pour les Auteurs (Guidelines)",
     authorInstructionsPlaceholder: "Rédigez les consignes de soumission (format, longueur, style...).",
@@ -331,7 +351,30 @@ const translations = {
     supabaseJwt: "JWT Secret",
     exportSqlSchema: "Exporter le Schéma SQL",
     resetDatabase: "Réinitialiser la Base de Données",
-    resetConfirm: "Confirmer la réinitialisation ? Toutes les données seront supprimées."
+    resetConfirm: "Confirmer la réinitialisation ? Toutes les données seront supprimées.",
+    
+    // ── Workspace & Dashboard Hub ──
+    pwErrorLength: "Le mot de passe doit comporter au moins 6 caractères.",
+    pwErrorMatch: "Les mots de passe ne correspondent pas.",
+    pwErrorFail: "Impossible de changer le mot de passe. Veuillez contacter le support.",
+    secureInterface: "INTERFACE DE L'ESPACE DE TRAVAIL SÉCURISÉ",
+    sessionRole: "RÔLE DE SESSION",
+    tenantLabel: "CONGRÈS",
+    signinAccount: "Se connecter à votre compte",
+    dontHaveAccount: "Vous n'avez pas de compte ?",
+    createOneNow: "Créez-en un maintenant",
+    welcomeBack: "Bienvenue,",
+    dualRoleContext: "Votre profil détient plusieurs rôles. Veuillez choisir votre espace de travail :",
+    partAuthorWorkspace: "Espace Auteur / Participant",
+    partAuthorWorkspaceDesc: "Soumettez des articles, consultez le programme, regardez les posters et discutez.",
+    revPanel: "Espace Évaluateur Académique",
+    revPanelDesc: "Évaluez les articles assignés et soumettez vos grilles de relecture.",
+    pscConsoleTitle: "Espace Président du Comité Scientifique",
+    pscConsoleDesc: "Gérez les thématiques, assignez les relecteurs et validez les rapports.",
+    presConsoleTitle: "Espace Président de l'Organisation (POC)",
+    presConsoleDesc: "Gérez la logistique, la charte graphique et générez les badges.",
+    superadminConsoleTitle: "Espace Administrateur Global SaaS",
+    superadminConsoleDesc: "Gérez les conférences, les connexions et les comptes administrateurs."
   },
 
   en: {
@@ -400,6 +443,13 @@ const translations = {
     submitBtn: "Submit",
     loginError: "Incorrect email or password.",
     loginSuccess: "Login successful!",
+    authTitle: "Sympovex Authentication",
+    awaitingValTitle: "Awaiting Validation",
+    awaitingValDesc: "Your account registration request is pending validation by the administrator. You will be able to sign in once activated.",
+    submitReg: "Submit Registration",
+    regSuccessTitle: "Registration Request Received",
+    regSuccessDesc: "Your account registration has been successfully recorded. An administrator will review and validate it before you can log in.",
+    createAccount: "Create Account",
     
     // ── Dashboard Hub ─────────────────────────────────────────────────────────
     accessRestricted: "Workspace Access Restricted",
@@ -600,6 +650,19 @@ const translations = {
     provBtn: "Create Account",
     provSuccess: "Account created. User will be forced to change their password on first login.",
     
+    // PSC — Provisioning Bulk
+    bulkProvisionTitle: "Bulk Provisioning (Excel/CSV)",
+    bulkProvisionDesc: "Import a list of users from an Excel/CSV file or export existing accounts.",
+    downloadTemplate: "Download Template (.csv)",
+    importPlaceholder: "Drag & drop or select a CSV file...",
+    importFileBtn: "Choose File",
+    importSubmitBtn: "Import & Provision",
+    exportPartBtn: "Export Participants",
+    exportRevBtn: "Export Reviewers",
+    exportAllBtn: "Export All Accounts",
+    importReportSuccess: "Import successful! {count} accounts provisioned.",
+    importReportError: "Import failed: {error}",
+    
     // PSC — Guidelines & Criteria
     authorInstructions: "Author Submission Guidelines",
     authorInstructionsPlaceholder: "Write the submission guidelines (format, length, style...).",
@@ -660,7 +723,30 @@ const translations = {
     supabaseJwt: "JWT Secret",
     exportSqlSchema: "Export SQL Schema",
     resetDatabase: "Reset Database",
-    resetConfirm: "Confirm reset? All data will be permanently deleted."
+    resetConfirm: "Confirm reset? All data will be permanently deleted.",
+    
+    // ── Workspace & Dashboard Hub ──
+    pwErrorLength: "Password must be at least 6 characters.",
+    pwErrorMatch: "Passwords do not match.",
+    pwErrorFail: "Failed to change password. Please contact support.",
+    secureInterface: "SECURE WORKSPACE INTERFACE",
+    sessionRole: "SESSION ROLE",
+    tenantLabel: "TENANT",
+    signinAccount: "Sign In to Account",
+    dontHaveAccount: "Don't have an account?",
+    createOneNow: "Create one now",
+    welcomeBack: "Welcome back,",
+    dualRoleContext: "Your profile holds multiple role contexts. Please select your workspace environment:",
+    partAuthorWorkspace: "Participant / Author Workspace",
+    partAuthorWorkspaceDesc: "Submit papers, check schedules, view E-posters, and message other delegates.",
+    revPanel: "Academic Reviewer Panel",
+    revPanelDesc: "Access assigned papers, evaluate submissions, and log review score cards.",
+    pscConsoleTitle: "PSC Program Chair Console",
+    pscConsoleDesc: "Manage tracks, assign reviewers, validate papers, and oversee participants.",
+    presConsoleTitle: "President / POC Console",
+    presConsoleDesc: "Configure details, brand colors, speakers list, and generate mail merge.",
+    superadminConsoleTitle: "Superadmin Platform Hub",
+    superadminConsoleDesc: "Global SaaS administration: provision conference tenants and assign credentials."
   }
 };
 

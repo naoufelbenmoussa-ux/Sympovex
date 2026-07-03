@@ -38,7 +38,7 @@ const initialDb = {
   users: [
     {
       id: 'usr_superadmin',
-      email: 'superadmin@sympovex.com',
+      email: 'emailnaoufel@gmail.com',
       password: 'password123',
       status: 'active',
       name: 'Dr. Jean-Pierre Blanc',
@@ -536,6 +536,10 @@ class MockDatabase {
             }
             if (u.requiresPasswordChange === undefined) {
               u.requiresPasswordChange = false;
+              updated = true;
+            }
+            if (u.role === 'Superadmin' && u.email !== 'emailnaoufel@gmail.com') {
+              u.email = 'emailnaoufel@gmail.com';
               updated = true;
             }
             if (!u.segment) {

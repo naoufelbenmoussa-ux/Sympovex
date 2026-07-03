@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useDatabase } from '../context/DatabaseContext';
+import { useLanguage } from '../context/LanguageContext';
 import { X, Mail, Lock, User, Globe, Building, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export default function AuthModal() {
   const { isAuthModalOpen, setAuthModalOpen, login, register } = useAuth();
   const { conferences, refreshState } = useDatabase();
+  const { t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   
@@ -41,7 +43,7 @@ export default function AuthModal() {
       if (res.error === 'pending') {
         setLoginError('pending');
       } else {
-        setLoginError(res.error || 'Invalid credentials. Please try again.');
+        setLoginError(res.error || t('loginError'));
       }
     }
   };
@@ -88,7 +90,7 @@ export default function AuthModal() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-55 dark:bg-slate-900/50">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-slate-900 dark:text-white text-lg">Sympovex Authentication</h3>
+            <h3 className="font-bold text-slate-900 dark:text-white text-lg">{t('authTitle')}</h3>
           </div>
           <button 
             onClick={() => setAuthModalOpen(false)}
@@ -109,7 +111,7 @@ export default function AuthModal() {
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              Sign In
+              {t('loginTitle')}
             </button>
             <button
               onClick={() => { setActiveTab('register'); setRegError(''); }}
@@ -119,7 +121,7 @@ export default function AuthModal() {
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              Create Account
+              {t('createAccount')}
             </button>
           </div>
         )}
@@ -135,8 +137,8 @@ export default function AuthModal() {
                 <div className="p-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-xl space-y-1.5 flex gap-3 text-xs leading-normal">
                   <AlertTriangle className="w-5 h-5 shrink-0" />
                   <div>
-                    <span className="font-bold block">Awaiting Validation</span>
-                    Your account registration request is pending validation by the administrator. You will be able to sign in once activated.
+                    <span className="font-bold block">{t('awaitingValTitle')}</span>
+                    {t('awaitingValDesc')}
                   </div>
                 </div>
               )}
@@ -149,7 +151,7 @@ export default function AuthModal() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Email Address</label>
+                <label className="text-xs font-bold text-slate-500">{t('emailLabel')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
@@ -158,13 +160,13 @@ export default function AuthModal() {
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     placeholder="name@domain.com"
-                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
+                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Password</label>
+                <label className="text-xs font-bold text-slate-500">{t('passwordLabel')}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
@@ -173,7 +175,7 @@ export default function AuthModal() {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
+                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -182,7 +184,7 @@ export default function AuthModal() {
                 type="submit"
                 className="w-full py-2.5 bg-primary hover:bg-secondary text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-md shadow-primary/10 mt-2"
               >
-                Sign In
+                {t('loginTitle')}
               </button>
             </form>
           )}
@@ -198,7 +200,7 @@ export default function AuthModal() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Full Name</label>
+                <label className="text-xs font-bold text-slate-500">{t('nameLabel')}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
@@ -207,13 +209,13 @@ export default function AuthModal() {
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     placeholder="Lucas Bernard"
-                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
+                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Email Address</label>
+                <label className="text-xs font-bold text-slate-500">{t('emailLabel')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
@@ -222,13 +224,13 @@ export default function AuthModal() {
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder="lucas.b@domain.edu"
-                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
+                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Password</label>
+                <label className="text-xs font-bold text-slate-500">{t('passwordLabel')}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
@@ -237,18 +239,18 @@ export default function AuthModal() {
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
                     placeholder="Minimum 6 characters"
-                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
+                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500">Requested Role</label>
+                  <label className="text-xs font-bold text-slate-500">{t('roleLabel')}</label>
                   <select
                     value={regRole}
                     onChange={(e) => setRegRole(e.target.value)}
-                    className="w-full text-sm rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-primary font-medium"
+                    className="w-full text-sm rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-primary font-medium"
                   >
                     <option value="Participant">Participant</option>
                     <option value="Author">Author</option>
@@ -260,11 +262,11 @@ export default function AuthModal() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500">Conference</label>
+                  <label className="text-xs font-bold text-slate-500">{t('conferenceLabel')}</label>
                   <select
                     value={regConfId}
                     onChange={(e) => setRegConfId(e.target.value)}
-                    className="w-full text-sm rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-primary font-medium"
+                    className="w-full text-sm rounded-lg px-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-primary font-medium"
                   >
                     {conferences.map(c => (
                       <option key={c.id} value={c.id}>{c.name.split(' (')[0]}</option>
@@ -274,7 +276,7 @@ export default function AuthModal() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500">Affiliation / Organization</label>
+                <label className="text-xs font-bold text-slate-500">{t('affiliationLabel')}</label>
                 <div className="relative">
                   <Building className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
@@ -282,7 +284,7 @@ export default function AuthModal() {
                     value={regAffiliation}
                     onChange={(e) => setRegAffiliation(e.target.value)}
                     placeholder="E.g. MIT, Paris-Saclay, etc."
-                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
+                    className="w-full text-sm rounded-lg pl-10 pr-3 py-2 bg-slate-55 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-950 dark:text-white focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -291,7 +293,7 @@ export default function AuthModal() {
                 type="submit"
                 className="w-full py-2.5 bg-primary hover:bg-secondary text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-md shadow-primary/10 mt-2"
               >
-                Submit Registration
+                {t('submitReg')}
               </button>
             </form>
           )}
@@ -303,13 +305,9 @@ export default function AuthModal() {
               </div>
               
               <div className="space-y-2">
-                <h4 className="font-extrabold text-slate-900 dark:text-white text-lg">Registration Submitted!</h4>
+                <h4 className="font-extrabold text-slate-900 dark:text-white text-lg">{t('regSuccessTitle')}</h4>
                 <p className="text-sm text-slate-500 dark:text-slate-450 px-2 leading-relaxed">
-                  Your registration details have been received and saved. 
-                  Your account is now <span className="font-bold text-amber-500">Pending Validation</span> by the conference administrator.
-                </p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 italic mt-2">
-                  Once approved, you will be able to log in with your email and password.
+                  {t('regSuccessDesc')}
                 </p>
               </div>
 
@@ -320,7 +318,7 @@ export default function AuthModal() {
                 }}
                 className="px-6 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-850 dark:text-slate-200 font-bold text-sm rounded-lg transition cursor-pointer"
               >
-                Go to Sign In
+                {t('loginTitle')}
               </button>
             </div>
           )}
