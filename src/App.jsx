@@ -6,10 +6,11 @@ import Header from './components/Header';
 import LandingPage from './pages/LandingPage';
 import DashboardHub from './pages/DashboardHub';
 import PortalPage from './pages/PortalPage';
+import ProfilePage from './pages/ProfilePage';
 
 function AppContent() {
   const { currentConference } = useDatabase();
-  const [currentView, setCurrentView] = useState('portal'); // 'portal', 'landing' or 'dashboard'
+  const [currentView, setCurrentView] = useState('portal'); // 'portal', 'landing', 'profile' or 'dashboard'
 
   // Sync hash routing if present
   useEffect(() => {
@@ -21,6 +22,8 @@ function AppContent() {
         setCurrentView('portal');
       } else if (parts[1] === 'dashboard') {
         setCurrentView('dashboard');
+      } else if (parts[0] === 'profile' || parts[1] === 'profile') {
+        setCurrentView('profile');
       } else {
         setCurrentView('landing');
       }
@@ -42,6 +45,8 @@ function AppContent() {
       window.location.hash = '#/';
     } else if (view === 'dashboard') {
       window.location.hash = `#/${acronym || 'gacs2026'}/dashboard`;
+    } else if (view === 'profile') {
+      window.location.hash = `#/${acronym || 'gacs2026'}/profile`;
     } else {
       window.location.hash = `#/${acronym || 'gacs2026'}`;
     }
@@ -79,6 +84,8 @@ function AppContent() {
           <PortalPage />
         ) : currentView === 'landing' ? (
           <LandingPage />
+        ) : currentView === 'profile' ? (
+          <ProfilePage onBack={() => setViewAndHash('dashboard')} />
         ) : (
           <DashboardHub />
         )}

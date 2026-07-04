@@ -35,6 +35,21 @@ const initialDb = {
         secondary: '#047857',
         accent: '#3b82f6' // Blue
       }
+    },
+    {
+      id: 'aam2026',
+      name: 'International Conference on Advances in Additive Manufacturing (AAM 2026)',
+      startDate: '2026-12-05',
+      endDate: '2026-12-08',
+      venue: 'Exhibition Centre, Berlin, Germany',
+      status: 'active',
+      acronym: 'AAM 2026',
+      logo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=150&auto=format&fit=crop&q=60',
+      colors: {
+        primary: '#ec4899', // Pink
+        secondary: '#db2777',
+        accent: '#f59e0b' // Amber
+      }
     }
   ],
   users: [
@@ -524,6 +539,27 @@ class MockDatabase {
             }
             return c;
           });
+
+          // Ensure Advances in Additive Manufacturing is present
+          const hasAam = parsed.conferences.some(c => c.id === 'aam2026' || c.name.toLowerCase().includes('additive'));
+          if (!hasAam) {
+            parsed.conferences.push({
+              id: 'aam2026',
+              name: 'International Conference on Advances in Additive Manufacturing (AAM 2026)',
+              startDate: '2026-12-05',
+              endDate: '2026-12-08',
+              venue: 'Exhibition Centre, Berlin, Germany',
+              status: 'active',
+              acronym: 'AAM 2026',
+              logo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=150&auto=format&fit=crop&q=60',
+              colors: {
+                primary: '#ec4899',
+                secondary: '#db2777',
+                accent: '#f59e0b'
+              }
+            });
+            updated = true;
+          }
         }
 
         // Migrate users with roles array, requiresPasswordChange flag, and segment

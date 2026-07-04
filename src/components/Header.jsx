@@ -245,19 +245,25 @@ export default function Header({ currentView, setCurrentView }) {
               </div>
               
               <div className="relative">
-                {currentUser.photo ? (
-                  <img
-                    src={currentUser.photo}
-                    alt={currentUser.name}
-                    className="w-9 h-9 rounded-full object-cover ring-2 ring-primary/30"
-                  />
-                ) : (
-                  <div className="w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm">
-                    {currentUser.name?.charAt(0)}
-                  </div>
-                )}
+                <button
+                  onClick={() => setCurrentView('profile')}
+                  className="w-9 h-9 rounded-full overflow-hidden hover:scale-105 hover:ring-2 hover:ring-primary focus:outline-none transition cursor-pointer select-none flex items-center justify-center bg-slate-100 dark:bg-slate-800"
+                  title="Edit Profile"
+                >
+                  {currentUser.photo ? (
+                    <img
+                      src={currentUser.photo}
+                      alt={currentUser.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-primary font-bold text-sm">
+                      {currentUser.name?.charAt(0)}
+                    </span>
+                  )}
+                </button>
                 <span 
-                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 border-2 border-white dark:border-slate-900 rounded-full ${
+                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 border-2 border-white dark:border-slate-900 rounded-full pointer-events-none ${
                     currentUser.status === 'active' ? 'bg-green-500' : currentUser.status === 'pending' ? 'bg-amber-500 animate-pulse' : 'bg-red-500'
                   }`} 
                   title={`Status: ${currentUser.status}`} 

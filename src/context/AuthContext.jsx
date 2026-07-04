@@ -23,20 +23,6 @@ export const AuthProvider = ({ children }) => {
         } else {
           localStorage.removeItem(SESSION_KEY);
         }
-      } else {
-        // Default to usr_author1 (Lucas Bernard) to support seed tests on first load
-        const user = dbInstance.getUser('usr_author1');
-        if (user && user.status === 'active') {
-          const defaultSession = {
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-            name: user.name,
-            conferenceId: user.conferenceId || null
-          };
-          localStorage.setItem(SESSION_KEY, JSON.stringify(defaultSession));
-          setSession(defaultSession);
-        }
       }
     } catch (e) {
       localStorage.removeItem(SESSION_KEY);

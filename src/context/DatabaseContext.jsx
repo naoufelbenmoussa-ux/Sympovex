@@ -178,6 +178,16 @@ export const DatabaseProvider = ({ children }) => {
     }
   };
 
+  const updateUserProfile = (userId, profileData) => {
+    const users = dbInstance.getTable('users');
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      users[idx] = { ...users[idx], ...profileData };
+      dbInstance.updateTable('users', users);
+      refreshState();
+    }
+  };
+
   const activateUser = (userId) => {
     dbInstance.activateUser(userId);
     refreshState();
@@ -561,6 +571,7 @@ export const DatabaseProvider = ({ children }) => {
       createNewConference,
       createNewUser,
       updateUserRole,
+      updateUserProfile,
       activateUser,
       suspendUser,
       deleteUser,
