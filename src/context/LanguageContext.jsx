@@ -195,6 +195,24 @@ const translations = {
     noAssignedPapersTrack: "Aucun manuscrit n'est affecté à votre profil de track.",
     originalityNovelty: "Originalité & Nouveauté",
     methodologyRigor: "Méthodologie & Rigueur",
+
+    // ── Global Portal ──────────────────────────────────────────────────────────
+    portalTitle: "Plateforme Premium SaaS pour Congrès Scientifiques",
+    portalSub: "Gérez les soumissions, relisez les articles en double aveugle, animez le networking et analysez la satisfaction en temps réel.",
+    activeCongresses: "Congrès Actifs",
+    archivedCongresses: "Congrès Archivés",
+    enterCongress: "Entrer sur le site →",
+    viewArchives: "Consulter les archives",
+    platformFeatures: "Fonctionnalités de la Plateforme",
+    featureMultiTenant: "Multi-Tenant",
+    featureMultiTenantDesc: "Hébergez plusieurs congrès indépendants avec chartes graphiques et bases de données étanches.",
+    featureTranslation: "Traduction Intégrale",
+    featureTranslationDesc: "Traduction dynamique en temps réel de tous les textes statiques et dynamiques pour les participants mondiaux.",
+    featureReview: "Évaluation en Double Aveugle",
+    featureReviewDesc: "Affectation intelligente d'évaluateurs, rapports consolidés et validation par le comité scientifique.",
+    featureNetworking: "Réseautage & Galerie",
+    featureNetworkingDesc: "Messagerie instantanée, planification de réunions en face-à-face et galerie photo événementielle en direct.",
+    viewAllCongresses: "← Tous les Congrès",
     
     // ── PSC Dashboard ─────────────────────────────────────────────────────────
     pscConsole: "Console du Comité Scientifique (PSC)",
@@ -576,6 +594,24 @@ const translations = {
     noAssignedPapersTrack: "No manuscripts assigned to your track profile.",
     originalityNovelty: "Originality & Novelty",
     methodologyRigor: "Methodology & Rigor",
+
+    // ── Global Portal ──────────────────────────────────────────────────────────
+    portalTitle: "Premium SaaS Platform for Scientific Congresses",
+    portalSub: "Manage submissions, conduct double-blind peer reviews, drive attendee networking, and track survey analytics in real-time.",
+    activeCongresses: "Active Congresses",
+    archivedCongresses: "Archived Congresses",
+    enterCongress: "Enter Congress Site →",
+    viewArchives: "View Archives",
+    platformFeatures: "Platform Features",
+    featureMultiTenant: "Multi-Tenant",
+    featureMultiTenantDesc: "Host multiple independent congresses with isolated themes and database states.",
+    featureTranslation: "Full Localization",
+    featureTranslationDesc: "Dynamic real-time translation of all static and dynamic text content for global delegates.",
+    featureReview: "Double-Blind Review",
+    featureReviewDesc: "Smart reviewer assignment, consolidated reports, and validation pipeline for the program committee.",
+    featureNetworking: "Networking & Gallery",
+    featureNetworkingDesc: "Instant messaging, face-to-face meeting scheduling, and live interactive event galleries.",
+    viewAllCongresses: "← All Congresses",
     
     // ── PSC Dashboard ─────────────────────────────────────────────────────────
     pscConsole: "Scientific Committee (PSC) Master Console",

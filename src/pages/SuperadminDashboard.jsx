@@ -9,7 +9,8 @@ export default function SuperadminDashboard() {
     papers, 
     tickets, 
     createNewConference, 
-    createNewUser, 
+    adminUpdateConference,
+    createNewUser,
     updateUserRole,
     activateUser,
     deleteUser
@@ -451,7 +452,7 @@ CREATE TABLE votes (
 
       {/* CONFERENCES DIRECTORY */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <h3 className="font-bold text-slate-900 dark:text-white text-base">Active Conferences Directory</h3>
+        <h3 className="font-bold text-slate-900 dark:text-white text-base">Global Conferences Directory & Tenant Status Control</h3>
         
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-500 dark:text-slate-400 border-collapse">
@@ -460,6 +461,7 @@ CREATE TABLE votes (
                 <th className="py-3 px-4">Conference Details</th>
                 <th className="py-3 px-4">Venue & City</th>
                 <th className="py-3 px-4">Timeline</th>
+                <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Actions</th>
               </tr>
             </thead>
@@ -470,7 +472,7 @@ CREATE TABLE votes (
                     <img src={conf.logo} alt="Logo" className="w-8 h-8 rounded object-cover border" />
                     <div>
                       <span className="font-bold text-slate-900 dark:text-white text-sm block">{conf.name}</span>
-                      <span className="text-[10px] font-mono text-slate-400">ID: {conf.id}</span>
+                      <span className="text-[10px] font-mono text-slate-400">ID/Acronym: {conf.id}</span>
                     </div>
                   </td>
                   <td className="py-3 px-4 font-semibold text-slate-700 dark:text-slate-300">
@@ -478,6 +480,16 @@ CREATE TABLE votes (
                   </td>
                   <td className="py-3 px-4 font-mono font-medium">
                     {conf.startDate} to {conf.endDate}
+                  </td>
+                  <td className="py-3 px-4">
+                    <select
+                      value={conf.status || 'active'}
+                      onChange={(e) => adminUpdateConference(conf.id, { status: e.target.value })}
+                      className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
+                    >
+                      <option value="active">Active (Actif)</option>
+                      <option value="archived">Archived (Archivé)</option>
+                    </select>
                   </td>
                   <td className="py-3 px-4">
                     <button

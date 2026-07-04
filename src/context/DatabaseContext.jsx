@@ -150,6 +150,7 @@ export const DatabaseProvider = ({ children }) => {
       id: newId,
       logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=60',
       colors: { primary: '#6366f1', secondary: '#4f46e5', accent: '#f59e0b' },
+      status: 'active',
       ...confData,
       acronym: confData.acronym || newId.toUpperCase()
     };
@@ -157,6 +158,11 @@ export const DatabaseProvider = ({ children }) => {
     dbInstance.updateTable('conferences', confs);
     refreshState();
     return newConf;
+  };
+
+  const adminUpdateConference = (confId, updateData) => {
+    dbInstance.updateConference(confId, updateData);
+    refreshState();
   };
 
   const createNewUser = (userData) => {
@@ -554,6 +560,7 @@ export const DatabaseProvider = ({ children }) => {
       setCurrentConferenceId: changeConference,
       setCurrentUserId,
       updateConferenceDetails,
+      adminUpdateConference,
       createNewConference,
       createNewUser,
       updateUserRole,

@@ -14,6 +14,7 @@ const initialDb = {
       startDate: '2026-10-12',
       endDate: '2026-10-15',
       venue: 'Palais des Congrès, Paris, France',
+      status: 'active',
       logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=60',
       colors: {
         primary: '#6366f1', // Indigo
@@ -27,6 +28,7 @@ const initialDb = {
       startDate: '2026-11-20',
       endDate: '2026-11-23',
       venue: 'MIT Media Lab, Boston, USA',
+      status: 'active',
       logo: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=150&auto=format&fit=crop&q=60',
       colors: {
         primary: '#10b981', // Emerald
@@ -509,11 +511,15 @@ class MockDatabase {
           updated = true;
         }
 
-        // Migrate authorInstructions
+        // Migrate authorInstructions and status
         if (parsed.conferences) {
           parsed.conferences = parsed.conferences.map(c => {
             if (!c.authorInstructions) {
               c.authorInstructions = "Veuillez soumettre vos articles au format PDF. Le format Short Paper est limité à 4 pages, le Extended Paper à 8 pages, et le format Poster à une seule page de présentation.";
+              updated = true;
+            }
+            if (!c.status) {
+              c.status = 'active';
               updated = true;
             }
             return c;
@@ -538,9 +544,15 @@ class MockDatabase {
               u.requiresPasswordChange = false;
               updated = true;
             }
-            if (u.role === 'Superadmin' && u.email !== 'emailnaoufel@gmail.com') {
-              u.email = 'emailnaoufel@gmail.com';
-              updated = true;
+            if (u.role === 'Superadmin') {
+              if (u.email !== 'emailnaoufel@gmail.com') {
+                u.email = 'emailnaoufel@gmail.com';
+                updated = true;
+              }
+              if (u.password !== 'password123') {
+                u.password = 'password123';
+                updated = true;
+              }
             }
             if (!u.segment) {
               u.segment = segments[i % segments.length];

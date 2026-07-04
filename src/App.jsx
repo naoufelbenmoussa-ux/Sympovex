@@ -5,10 +5,11 @@ import { DatabaseProvider, useDatabase } from './context/DatabaseContext';
 import Header from './components/Header';
 import LandingPage from './pages/LandingPage';
 import DashboardHub from './pages/DashboardHub';
+import PortalPage from './pages/PortalPage';
 
 function AppContent() {
   const { currentConference } = useDatabase();
-  const [currentView, setCurrentView] = useState('landing'); // 'landing' or 'dashboard'
+  const [currentView, setCurrentView] = useState('portal'); // 'portal', 'landing' or 'dashboard'
 
   // Sync hash routing if present
   useEffect(() => {
@@ -16,7 +17,9 @@ function AppContent() {
       const hash = window.location.hash;
       const cleanHash = hash.replace(/^#\/?/, '');
       const parts = cleanHash.split('/').filter(Boolean);
-      if (parts[1] === 'dashboard') {
+      if (parts.length === 0) {
+        setCurrentView('portal');
+      } else if (parts[1] === 'dashboard') {
         setCurrentView('dashboard');
       } else {
         setCurrentView('landing');
@@ -34,11 +37,13 @@ function AppContent() {
     setCurrentView(view);
     const cleanHash = window.location.hash.replace(/^#\/?/, '');
     const parts = cleanHash.split('/').filter(Boolean);
-    const acronym = parts[0] || 'gacs2026';
-    if (view === 'dashboard') {
-      window.location.hash = `#/${acronym}/dashboard`;
+    const acronym = parts[0];
+    if (view === 'portal') {
+      window.location.hash = '#/';
+    } else if (view === 'dashboard') {
+      window.location.hash = `#/${acronym || 'gacs2026'}/dashboard`;
     } else {
-      window.location.hash = `#/${acronym}`;
+      window.location.hash = `#/${acronym || 'gacs2026'}`;
     }
   };
 
@@ -70,7 +75,9 @@ function AppContent() {
 
       {/* Main View Router */}
       <div className="flex-grow">
-        {currentView === 'landing' ? (
+        {currentView === 'portal' ? (
+          <PortalPage />
+        ) : currentView === 'landing' ? (
           <LandingPage />
         ) : (
           <DashboardHub />

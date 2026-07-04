@@ -108,10 +108,18 @@ export default function Header({ currentView, setCurrentView }) {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
         {/* Conference Logo & Name */}
         <div
-          onClick={() => setCurrentView('landing')}
+          onClick={() => {
+            if (currentView !== 'portal') {
+              window.location.hash = '#/';
+            }
+          }}
           className="flex items-center gap-3 cursor-pointer select-none"
         >
-          {currentConference?.logo ? (
+          {currentView === 'portal' ? (
+            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-bold border border-indigo-500/20">
+              SV
+            </div>
+          ) : currentConference?.logo ? (
             <img
               src={currentConference.logo}
               alt="Logo"
@@ -124,43 +132,50 @@ export default function Header({ currentView, setCurrentView }) {
           )}
           <div>
             <div className="font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-none text-base">
-              {currentConference?.name.split(' (')[0]}
+              {currentView === 'portal' ? 'Sympovex' : currentConference?.name?.split(' (')[0]}
+              {currentView !== 'portal' && (
+                <span className="text-[10px] font-bold text-primary hover:underline ml-2">
+                  {t('viewAllCongresses') || '← All Congresses'}
+                </span>
+              )}
             </div>
-            <span className="text-xs text-slate-500 font-medium">
-              {currentConference?.venue.split(', ').slice(-2).join(', ')}
+            <span className="text-xs text-slate-550 font-medium">
+              {currentView === 'portal' ? 'Scientific Congress SaaS Portal' : currentConference?.venue?.split(', ')?.slice(-2)?.join(', ')}
             </span>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1">
-          <button
-            onClick={() => setCurrentView('landing')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-1.5 ${
-              currentView === 'landing'
-                ? 'bg-primary/10 text-primary'
-                : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100/50'
-            }`}
-          >
-            <Compass className="w-4 h-4" />
-            {t('landingPage')}
-          </button>
-          
-          <button
-            onClick={() => setCurrentView('dashboard')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-1.5 ${
-              currentView === 'dashboard'
-                ? 'bg-primary/10 text-primary'
-                : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100/50'
-            }`}
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            {t('workspaceDashboard')}
-            {notificationCount > 0 && (
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" title={`${notificationCount} pending alerts`} />
-            )}
-          </button>
-        </nav>
+        {currentView !== 'portal' && (
+          <nav className="hidden md:flex items-center gap-1">
+            <button
+              onClick={() => setCurrentView('landing')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-1.5 ${
+                currentView === 'landing'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100/50'
+              }`}
+            >
+              <Compass className="w-4 h-4" />
+              {t('landingPage')}
+            </button>
+            
+            <button
+              onClick={() => setCurrentView('dashboard')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-1.5 ${
+                currentView === 'dashboard'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100/50'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              {t('workspaceDashboard')}
+              {notificationCount > 0 && (
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" title={`${notificationCount} pending alerts`} />
+              )}
+            </button>
+          </nav>
+        )}
 
         {/* User Identity & Utility Actions */}
         <div className="flex items-center gap-3">
