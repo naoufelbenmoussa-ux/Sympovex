@@ -46,7 +46,7 @@ export const DatabaseProvider = ({ children }) => {
         console.error(e);
       }
     }
-    return 'gacs2026';
+    return null;
   });
 
   // Sync state when URL hash changes
@@ -64,20 +64,17 @@ export const DatabaseProvider = ({ children }) => {
             setCurrentConfId(match.id);
           }
         } else {
-          window.location.hash = `#/gacs2026${cleanHash.includes('/dashboard') ? '/dashboard' : ''}`;
+          window.location.hash = '';
         }
       } else {
-        window.location.hash = '#/gacs2026';
+        if (currentConfId !== null) {
+          setCurrentConfId(null);
+        }
       }
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    
-    if (!window.location.hash) {
-      window.location.hash = '#/gacs2026';
-    } else {
-      handleHashChange();
-    }
+    handleHashChange();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [currentConfId]);
